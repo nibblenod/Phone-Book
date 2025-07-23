@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phone-Book", "Phone-Book\Phone-Book.csproj", "{461991BC-71E4-40A3-ABBE-B8F0722A2412}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhoneBook", "PhoneBook\PhoneBook.csproj", "{461991BC-71E4-40A3-ABBE-B8F0722A2412}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
