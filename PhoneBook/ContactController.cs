@@ -22,16 +22,63 @@ public class ContactController(ContactContext contactDbContext)
 
     public Task<List<Contact>> GetContact(string query, QueryType queryType)
     {
-        Expression<Func<Contact, bool>> func = queryType switch
+        /*
+         use Expression instead of Func because it's better
+        for performance and creates a tree that EF can see
+        through and know exactly what to retrieve instead of
+        retrieving all the records and then using LINQ on it.
+        */
+        Expression<Func<Contact, bool>> func = queryType switch 
         {
             QueryType.PhoneNumber => (contact => contact.PhoneNumber == query),
             QueryType.Email => contact => contact.Email == query,
             QueryType.Name => contact => contact.Name == query,
         };
 
-        return contactDbContext.Contacts.Where(func).ToListAsync();
+        return contactDbContext.Contacts
+            .Where(func)
+            .ToListAsync();
     }
 
-  
-    
+    public async Task DeleteContact(int id)
+    {
+        var contact = await GetContactById(id);
+
+        contactDbContext.Remove<Contact>(contact);
+
+        await contactDbContext.SaveChangesAsync();
+
+    }
+
+    public async Task UpdateContact(int id, QueryType updateType, string updateValue)
+    {
+        var contact = await GetContactById(id);
+
+        switch (updateType)
+        {
+            case QueryType.Email:
+                contact.Email = updateValue;
+                break; 
+            case QueryType.Name:
+                contact.Name = updateValue;
+                break;
+            case QueryType.PhoneNumber:
+                contact.PhoneNumber = updateValue;
+                break;
+        }
+
+        await contactDbContext.SaveChangesAsync();
+
+    }
+
+    private async Task<Contact> GetContactById(int id)
+    {
+        var contact = await contactDbContext.Contacts
+            .Where(contact => contact.Id == id)
+            .FirstOrDefaultAsync();
+
+        return contact;
+
+    }
+
 }

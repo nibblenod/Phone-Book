@@ -24,10 +24,6 @@ public class ContactContext : DbContext
             .IsUnique();
         
         modelBuilder.Entity<Contact>()
-            .HasIndex(contact => contact.Name)
-            .IsUnique();
-        
-        modelBuilder.Entity<Contact>()
             .HasIndex(contact => contact.PhoneNumber)
             .IsUnique();
     }
