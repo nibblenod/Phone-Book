@@ -18,10 +18,23 @@ public class ContactContext : DbContext
             new Contact { Id = 4, Name = "Noah Mehta", Email = "noah.mehta@example.com", PhoneNumber = "9911223344" },
             new Contact { Id = 5, Name = "Sophia Shah", Email = "sophia.shah@example.com", PhoneNumber = "9887766554" },
         });
+
+        modelBuilder.Entity<Contact>()
+            .HasIndex(contact => contact.Email)
+            .IsUnique();
+        
+        modelBuilder.Entity<Contact>()
+            .HasIndex(contact => contact.Name)
+            .IsUnique();
+        
+        modelBuilder.Entity<Contact>()
+            .HasIndex(contact => contact.PhoneNumber)
+            .IsUnique();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        //appsettings.json wasn't working well with Migration so had to go with app.config
         optionsBuilder.UseSqlServer(System.Configuration.ConfigurationManager.ConnectionStrings["ContactDBLocalConnection"].ConnectionString);
     }
 }
