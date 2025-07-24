@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Phone_Book.Enums;
 using Phone_Book.Models;
 using Phone_Book.Helpers;
+using Validator = Phone_Book.Helpers.Validator;
 
 namespace Phone_Book.Controllers;
 
@@ -12,11 +13,70 @@ public class DisplayController(ContactContext contactContext)
     private readonly ContactController contactController = new ContactController(contactContext);
 
 
-    public async Task SearchHandler()
+    public async Task MainMenuHandler()
     {
-        while (true)
+        Operation operationType = AskForSearchType(Enum.GetValues<Operation>(), "What do you want to do?");
+
+        switch (operationType)
         {
-            Console.Clear();
+            case Operation.Search:
+                await SearchContactHandler();
+                break;
+            case Operation.Add:
+                await AddContactHandler();
+                break;
+            case Operation.Update:
+                await UpdateContactHandler();
+                break;
+            case Operation.Delete:
+                await DeleteContactHandler();
+                break;
+            
+        }
+    }
+
+    private async Task DeleteContactHandler()
+    {
+        AnsiConsole.Markup("Look up the contact that you want to delete...");
+        Console.ReadKey();
+        List<Contact> contacts = await SearchContactHandler();
+
+        if (!Validator.ContactsExist(contacts)) return;
+       
+        
+        int i = 0;
+        Contact contact = AnsiConsole.Prompt(
+            new SelectionPrompt<Contact>()
+                .Title("Which contact do you want to delete? ")
+                .AddChoices(contacts).UseConverter(contact => i++.ToString()));
+
+        try
+        {
+            await contactController.DeleteContact(contact);
+            AnsiConsole.Markup("[green]Contact deleted successfully![/]");
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.Markup($"[red]Contact couldn't be deleted![/] Error: {ex.Message}");
+        }
+        
+
+    }
+
+    private async Task UpdateContactHandler()
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task AddContactHandler()
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task<List<Contact>> SearchContactHandler()
+    {
+            Console.WriteLine();
+            List<Contact> results = new List<Contact>();
             QueryType searchType = AskForSearchType(Enum.GetValues<QueryType>(), "How do you want to search?");
             string query = AskForSearchQuery(searchType
                 .GetAttribute<DisplayAttribute>()?
@@ -24,15 +84,22 @@ public class DisplayController(ContactContext contactContext)
 
             bool isValid = searchType switch
             {
-                QueryType.Email => Phone_Book.Helpers.Validator.ValidateEmail(query),
-                QueryType.PhoneNumber => Phone_Book.Helpers.Validator.ValidatePhoneNumber(query),
-                QueryType.Name => Phone_Book.Helpers.Validator.ValidateName(query),
+                QueryType.Email => Validator.ValidateEmail(query),
+                QueryType.PhoneNumber => Validator.ValidatePhoneNumber(query),
+                QueryType.Name => Validator.ValidateName(query),
             };
 
             if (isValid)
             {
-                List<Contact> results = await contactController.GetContact(query, searchType);
-                PrintResults(results);
+                try
+                {
+                    results = await contactController.GetContact(query, searchType);
+                    PrintResults(results);
+                }
+                catch (Exception ex)
+                {
+                    AnsiConsole.Markup($"[red]Couldn't retrieve contacts![/] Error: {ex.Message}");
+                }
             }
             else AnsiConsole.Markup($"[red]Invalid {searchType
                 .GetAttribute<DisplayAttribute>()?
@@ -41,17 +108,19 @@ public class DisplayController(ContactContext contactContext)
             Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
 
-        }
-
+            return results;
     }
+
+    
     
     private void PrintResults(List<Contact> results)
     {
-        if (results.Count == 0)
+        if (!Validator.ContactsExist(results))
         {
             AnsiConsole.Markup("[red]No contacts found![/]");
             return;
         }
+        
         Table table = new Table();
 
         table.AddColumn("No.");
@@ -78,6 +147,7 @@ public class DisplayController(ContactContext contactContext)
                 .AddChoices(array).UseConverter(option => option.GetAttribute<DisplayAttribute>()?.Name ?? option.ToString()));
         return searchType;
     }
+    
 
     private string AskForSearchQuery(string queryType)
     {

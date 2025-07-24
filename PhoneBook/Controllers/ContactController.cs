@@ -42,11 +42,10 @@ public class ContactController(ContactContext contactDbContext)
             .ToListAsync();
     }
 
-    public async Task DeleteContact(int id)
+    public async Task DeleteContact(Contact contact)
     {
-        var contact = await GetContactById(id);
-
-        contactDbContext.Remove<Contact>(contact);
+        
+        contactDbContext.Remove(contact);
 
         await contactDbContext.SaveChangesAsync();
 

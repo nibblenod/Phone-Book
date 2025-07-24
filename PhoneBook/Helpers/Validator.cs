@@ -1,10 +1,15 @@
 using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
+using Phone_Book.Models;
 
 namespace Phone_Book.Helpers;
 
 public static class Validator
 {
+    public static bool ContactsExist(List<Contact> contacts)
+    {
+        return (contacts.Count != 0);
+    }
     public static bool ValidateEmail(string email)
     {
         return !email.IsNullOrEmpty() && Regex.IsMatch(email,@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
