@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Phone_Book;
+namespace Phone_Book.Helpers;
 
 public static class Validator
 {

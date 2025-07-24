@@ -1,30 +1,32 @@
 using Spectre.Console;
 using System.ComponentModel.DataAnnotations;
+using Phone_Book.Enums;
 using Phone_Book.Models;
+using Phone_Book.Helpers;
 
-
-namespace Phone_Book;
+namespace Phone_Book.Controllers;
 
 public class DisplayController(ContactContext contactContext)
 
 {
     private readonly ContactController contactController = new ContactController(contactContext);
-    
-    public async Task MenuHandler()
+
+
+    public async Task SearchHandler()
     {
         while (true)
         {
             Console.Clear();
-            QueryType searchType = AskForSearchType();
+            QueryType searchType = AskForSearchType(Enum.GetValues<QueryType>(), "How do you want to search?");
             string query = AskForSearchQuery(searchType
                 .GetAttribute<DisplayAttribute>()?
                 .Name ?? searchType.ToString());
 
             bool isValid = searchType switch
             {
-                QueryType.Email => Validator.ValidateEmail(query),
-                QueryType.PhoneNumber => Validator.ValidatePhoneNumber(query),
-                QueryType.Name => Validator.ValidateName(query),
+                QueryType.Email => Phone_Book.Helpers.Validator.ValidateEmail(query),
+                QueryType.PhoneNumber => Phone_Book.Helpers.Validator.ValidatePhoneNumber(query),
+                QueryType.Name => Phone_Book.Helpers.Validator.ValidateName(query),
             };
 
             if (isValid)
@@ -67,13 +69,13 @@ public class DisplayController(ContactContext contactContext)
         
         AnsiConsole.Write(table);
     }
-    
-    private QueryType AskForSearchType()
+
+    private TOption AskForSearchType<TOption>(TOption[] array, string title) where TOption : Enum
     {
-        QueryType searchType = AnsiConsole.Prompt(
-            new SelectionPrompt<QueryType>()
-                .Title("How do you want to search?")
-                .AddChoices(Enum.GetValues<QueryType>()).UseConverter(queryType => queryType.GetAttribute<DisplayAttribute>()?.Name ?? queryType.ToString()));
+        TOption searchType = AnsiConsole.Prompt(
+            new SelectionPrompt<TOption>()
+                .Title(title)
+                .AddChoices(array).UseConverter(option => option.GetAttribute<DisplayAttribute>()?.Name ?? option.ToString()));
         return searchType;
     }
 

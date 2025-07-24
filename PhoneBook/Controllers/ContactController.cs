@@ -1,7 +1,9 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Phone_Book.Enums;
 using Phone_Book.Models;
-namespace Phone_Book;
+
+namespace Phone_Book.Controllers;
 
 public class ContactController(ContactContext contactDbContext)
 {

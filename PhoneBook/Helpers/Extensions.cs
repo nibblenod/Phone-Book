@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Phone_Book
+namespace Phone_Book.Helpers
 {
     internal static class Extensions
     {

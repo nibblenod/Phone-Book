@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Phone_Book;
+namespace Phone_Book.Enums;
 
 public enum QueryType
 {
