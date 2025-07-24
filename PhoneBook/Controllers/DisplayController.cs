@@ -8,7 +8,7 @@ namespace Phone_Book;
 public class DisplayController(ContactContext contactContext)
 
 {
-    private ContactController contactController = new ContactController(contactContext);
+    private readonly ContactController contactController = new ContactController(contactContext);
     
     public async Task MenuHandler()
     {
@@ -20,19 +20,12 @@ public class DisplayController(ContactContext contactContext)
                 .GetAttribute<DisplayAttribute>()?
                 .Name ?? searchType.ToString());
 
-            bool isValid = false;
-            switch (searchType)
+            bool isValid = searchType switch
             {
-                case QueryType.Email:
-                    isValid = Validator.ValidateEmail(query);
-                    break;
-                case QueryType.PhoneNumber:
-                    isValid = Validator.ValidatePhoneNumber(query);
-                    break;
-                case QueryType.Name:
-                    isValid = Validator.ValidateName(query);
-                    break;
-            }
+                QueryType.Email => Validator.ValidateEmail(query),
+                QueryType.PhoneNumber => Validator.ValidatePhoneNumber(query),
+                QueryType.Name => Validator.ValidateName(query),
+            };
 
             if (isValid)
             {
@@ -88,7 +81,7 @@ public class DisplayController(ContactContext contactContext)
     {
         var query = AnsiConsole.Ask<string>($"Search using {queryType}");
         
-        return query;
+        return query.ToLower();
     }
     
 }
