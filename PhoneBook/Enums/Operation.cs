@@ -11,5 +11,6 @@ public enum Operation
     [Display(Name="Update Contact")]
     Update,
     [Display(Name="Delete Contact")]
-    Delete
+    Delete,
+    Exit
 }

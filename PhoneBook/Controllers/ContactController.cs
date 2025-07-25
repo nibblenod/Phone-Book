@@ -9,15 +9,10 @@ public class ContactController(ContactContext contactDbContext)
 {
     private readonly ContactContext contactDbContext = contactDbContext;
     
-    public async Task AddContact(string email, string phoneNumber, string name)
+    public async Task AddContact(Contact contact)
     {
-        Contact contactToAdd = new Contact()
-        {
-            Email = email,
-            PhoneNumber = phoneNumber,
-            Name = name,
-        };
-        contactDbContext.Contacts.Add(contactToAdd);
+        
+        contactDbContext.Contacts.Add(contact);
 
         await contactDbContext.SaveChangesAsync();
     }
@@ -51,9 +46,8 @@ public class ContactController(ContactContext contactDbContext)
 
     }
 
-    public async Task UpdateContact(int id, QueryType updateType, string updateValue)
+    public async Task UpdateContact(Contact contact,  QueryType updateType, string updateValue)
     {
-        var contact = await GetContactById(id);
 
         switch (updateType)
         {

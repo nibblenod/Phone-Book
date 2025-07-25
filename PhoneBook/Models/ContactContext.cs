@@ -30,7 +30,10 @@ public class ContactContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        //appsettings.json wasn't working well with Migration so had to go with app.config
-        optionsBuilder.UseSqlServer(System.Configuration.ConfigurationManager.ConnectionStrings["ContactDBLocalConnection"].ConnectionString);
+        IConfiguration configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
+            .Build();
+        optionsBuilder.UseSqlServer(configuration.GetConnectionString("SchoolDBLocalConnection"));
     }
 }
